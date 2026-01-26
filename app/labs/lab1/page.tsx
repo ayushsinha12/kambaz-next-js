@@ -2,6 +2,7 @@ export default function Lab1() {
     return (
       <div id="wd-lab1">
         <h2>Lab 1</h2>
+        <h3>Ayush Sinha</h3>
         <h3>HTML Examples</h3>
   
         <div id="wd-h-tag">
@@ -265,7 +266,7 @@ export default function Lab1() {
 
             <h4>Anchor tag</h4>
             Please 
-            <a href="https://github.com/ayushsinha12" id="wd-github">click here</a>
+            <a href="https://github.com/ayushsinha12/kambaz-next-js" id="wd-github">click here</a>
             to get to my code repository<br/>
 
         </form>
