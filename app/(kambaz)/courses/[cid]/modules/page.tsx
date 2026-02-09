@@ -1,23 +1,66 @@
+import ModulesControls from "./modulesControls";
+import ModuleControlButtons from "./moduleControlButtons";
+import LessonControlButtons from "./lessonControlButtons";
+import { ListGroup, ListGroupItem } from "react-bootstrap";
+
 export default function Modules() {
-    return (
-      <div>
-        {/* Implement Collapse All button, View Progress button, etc. */}
-        <ul id="wd-modules">
-          <li className="wd-module">
-            <div className="wd-title">Week 1</div>
-            <ul className="wd-lessons">
-              <li className="wd-lesson">
-                <span className="wd-title">LEARNING OBJECTIVES</span>
-                <ul className="wd-content">
-                  <li className="wd-content-item">Introduction to the course</li>
-                  <li className="wd-content-item">Learn what is Web Development</li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li className="wd-module"> <div className="wd-title">Week 2</div> </li>
-          <li className="wd-module"> <div className="wd-title">Week 3</div> </li>
-        </ul>
-      </div>
-  );}
-  
+  return (
+    <div>
+      <ModulesControls /><br /><br /><br /><br />
+
+      <ListGroup className="rounded-0" id="wd-modules">
+
+        {/* Week 1 */}
+        <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
+          <div className="wd-title p-3 ps-2 bg-secondary">
+            <ModuleControlButtons />
+            Week 1
+          </div>
+
+          <ListGroup className="wd-lessons rounded-0">
+            <ListGroupItem className="wd-lesson p-3 ps-1">
+              <LessonControlButtons />
+              LEARNING OBJECTIVES
+            </ListGroupItem>
+            <ListGroupItem className="wd-lesson p-3 ps-1">
+              <LessonControlButtons />
+              Introduction to the course
+            </ListGroupItem>
+            <ListGroupItem className="wd-lesson p-3 ps-1">
+              <LessonControlButtons />
+              Learn what is Web Development
+            </ListGroupItem>
+          </ListGroup>
+        </ListGroupItem>
+
+        {/* Week 2 */}
+        <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
+          <div className="wd-title p-3 ps-2 bg-secondary">
+            <ModuleControlButtons />
+            Week 2
+          </div>
+
+          <ListGroup className="wd-lessons rounded-0">
+            <ListGroupItem className="wd-lesson p-3 ps-1">
+              <LessonControlButtons />
+              LESSON 1
+            </ListGroupItem>
+            <ListGroupItem className="wd-lesson p-3 ps-1">
+              <LessonControlButtons />
+              LESSON 2
+            </ListGroupItem>
+          </ListGroup>
+        </ListGroupItem>
+
+        {/* Week 3 */}
+        <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
+          <div className="wd-title p-3 ps-2 bg-secondary">
+            <ModuleControlButtons />
+            Week 3
+          </div>
+        </ListGroupItem>
+
+      </ListGroup>
+    </div>
+  );
+}
