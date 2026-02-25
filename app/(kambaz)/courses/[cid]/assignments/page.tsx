@@ -1,146 +1,53 @@
-// app/(kambaz)/courses/[cid]/assignments/[aid]/page.tsx
+"use client";
+
 import Link from "next/link";
-import { Button, Col, Form, FormControl, FormLabel, FormSelect, Row } from "react-bootstrap";
+import { useParams } from "next/navigation";
+import {
+  Button,
+  FormControl,
+  InputGroup,
+  ListGroup,
+  ListGroupItem,
+} from "react-bootstrap";
+import * as db from "../../../database";
 
-export default function AssignmentEditor() {
+export default function Assignments() {
+  const { cid } = useParams<{ cid: string }>();
+  const assignments = db.assignments;
+
   return (
-    <div id="wd-assignment-editor" className="p-3">
-      <Form>
-        <FormLabel>Assignment Name</FormLabel>
-        <FormControl className="mb-3" defaultValue="A1" />
+    <div id="wd-assignments" className="p-3">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <InputGroup style={{ maxWidth: 400 }}>
+          <FormControl placeholder="Search..." />
+        </InputGroup>
 
-        <FormControl
-          as="textarea"
-          className="mb-3"
-          style={{ height: "180px" }}
-          defaultValue={
-`The assignment is available online
-Submit a link to the landing page of your Web application running on Netlify.
-
-The landing page should include the following:
-- Your full name and section
-- Links to each of the lab assignments
-- Link to the Kanbas application
-- Links to all relevant source code repositories
-
-The Kanbas application should include a link to navigate back to the landing page.`
-          }
-        />
-
-        <Row className="mb-3 align-items-center">
-          <Col sm={3}>
-            <FormLabel className="mb-0">Points</FormLabel>
-          </Col>
-          <Col sm={9}>
-            <FormControl type="number" defaultValue={100} />
-          </Col>
-        </Row>
-
-        <Row className="mb-3 align-items-center">
-          <Col sm={3}>
-            <FormLabel className="mb-0">Assignment Group</FormLabel>
-          </Col>
-          <Col sm={9}>
-            <FormSelect>
-              <option value="ASSIGNMENTS" defaultChecked>
-                ASSIGNMENTS
-              </option>
-              <option value="QUIZZES">QUIZZES</option>
-              <option value="PROJECTS">PROJECTS</option>
-            </FormSelect>
-          </Col>
-        </Row>
-
-        <Row className="mb-3 align-items-center">
-          <Col sm={3}>
-            <FormLabel className="mb-0">Display Grade as</FormLabel>
-          </Col>
-          <Col sm={9}>
-            <FormSelect>
-              <option value="PERCENTAGE" defaultChecked>
-                Percentage
-              </option>
-              <option value="POINTS">Points</option>
-            </FormSelect>
-          </Col>
-        </Row>
-
-        <Row className="mb-3 align-items-center">
-          <Col sm={3}>
-            <FormLabel className="mb-0">Submission Type</FormLabel>
-          </Col>
-          <Col sm={9}>
-            <FormSelect>
-              <option value="ONLINE" defaultChecked>
-                Online
-              </option>
-              <option value="ON_PAPER">On Paper</option>
-            </FormSelect>
-          </Col>
-        </Row>
-
-        <div className="border p-3 mb-3">
-          <FormLabel className="fw-bold">Online Entry Options</FormLabel>
-
-          <div>
-            <input type="checkbox" className="me-2" />
-            <label>Text Entry</label>
-          </div>
-
-          <div>
-            <input type="checkbox" className="me-2" defaultChecked />
-            <label>Website URL</label>
-          </div>
-
-          <div>
-            <input type="checkbox" className="me-2" />
-            <label>Media Recordings</label>
-          </div>
-
-          <div>
-            <input type="checkbox" className="me-2" />
-            <label>Student Annotation</label>
-          </div>
-
-          <div>
-            <input type="checkbox" className="me-2" />
-            <label>File Uploads</label>
-          </div>
+        <div className="d-flex gap-2">
+          <Button variant="secondary">+ Group</Button>
+          <Button variant="danger">+ Assignment</Button>
         </div>
+      </div>
 
-        <div className="border p-3 mb-3">
-          <Row className="mb-3 align-items-center">
-            <Col sm={3}>
-              <FormLabel className="mb-0">Assign</FormLabel>
-            </Col>
-            <Col sm={9}>
-              <FormLabel>Assign to</FormLabel>
-              <FormControl defaultValue="Everyone" className="mb-2" />
-
-              <FormLabel>Due</FormLabel>
-              <FormControl type="date" className="mb-2" defaultValue="2024-05-13" />
-
-              <Row>
-                <Col>
-                  <FormLabel>Available from</FormLabel>
-                  <FormControl type="date" defaultValue="2024-05-06" />
-                </Col>
-                <Col>
-                  <FormLabel>Until</FormLabel>
-                  <FormControl type="date" defaultValue="2024-05-13" />
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </div>
-
-        <div className="d-flex justify-content-end gap-2">
-          <Link href=".." className="btn btn-light">
-            Cancel
-          </Link>
-          <Button variant="danger">Save</Button>
-        </div>
-      </Form>
+      <ListGroup className="rounded-0">
+        {assignments
+          .filter((a) => a.course === cid)
+          .map((a) => (
+            <ListGroupItem
+              key={a._id}
+              className="d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <Link
+                  href={`/courses/${cid}/assignments/${a._id}`}
+                  className="text-decoration-none"
+                >
+                  {a.title}
+                </Link>
+              </div>
+              <div className="text-muted small">{a._id}</div>
+            </ListGroupItem>
+          ))}
+      </ListGroup>
     </div>
   );
 }

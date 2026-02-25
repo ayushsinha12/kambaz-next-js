@@ -1,0 +1,17 @@
+import ListGroup from "react-bootstrap/ListGroup";
+import TodoItem from "./todoItem";
+import todos from "./todos.json";
+
+export default function TodoList() {
+  return (
+    <>
+      <h3>Todo List</h3>
+      <ListGroup>
+        {todos.map((todo, index) => (
+          <TodoItem key={index} todo={todo} />
+        ))}
+      </ListGroup>
+      <hr />
+    </>
+  );
+}
