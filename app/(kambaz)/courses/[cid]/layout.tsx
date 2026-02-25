@@ -18,7 +18,7 @@ export default async function CourseLayout({
 }) {
   const { cid } = await params;
 
-  const course = (db.courses as Course[]).find((c) => c.id === cid);
+  const course = db.courses.find((c) => c._id === cid);
 
   return (
     <div id="wd-courses">
