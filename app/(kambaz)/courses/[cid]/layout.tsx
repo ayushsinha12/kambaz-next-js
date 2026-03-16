@@ -1,39 +1,36 @@
-import type { ReactNode } from "react";
+"use client";
+import { ReactNode } from "react";
 import { FaAlignJustify } from "react-icons/fa6";
-import * as db from "../../database";
 import CourseNavigation from "./navigation";
-import Breadcrumb from "./breadcrumb";
+import { useSelector } from "react-redux";
+import { useParams } from "next/navigation";
+import { RootState } from "../../store";
+import { useState } from "react";
 
-type Course = {
-  id: string;
-  name: string;
-};
+export default function CoursesLayout({ children }: { children: ReactNode }) {
+  const { cid } = useParams();
+  const { courses } = useSelector((state: RootState) => state.coursesReducer);
+  const course = courses.find((course: any) => course._id === cid);
 
-export default async function CourseLayout({
-  children,
-  params,
-}: {
-  children: ReactNode;
-  params: Promise<{ cid: string }>;
-}) {
-  const { cid } = await params;
-
-  const course = db.courses.find((c) => c._id === cid);
+  const [showNavigation, setShowNavigation] = useState(true);
 
   return (
     <div id="wd-courses">
-      <h2 className="text-danger">
-        <FaAlignJustify className="me-4 fs-4 mb-1" />
+      <h2>
+        <FaAlignJustify
+          className="me-4 fs-4 mb-1"
+          onClick={() => setShowNavigation(!showNavigation)}
+        />
         {course?.name}
-        <br />
-        <Breadcrumb course={course} />
       </h2>
-
-      <div className="row">
-        <div className="col-2">
-          <CourseNavigation cid={cid} />
-        </div>
-        <div className="col-10">{children}</div>
+      <hr />
+      <div className="d-flex">
+        {showNavigation && (
+          <div>
+            <CourseNavigation cid={cid as string} />
+          </div>
+        )}
+        <div className="flex-fill">{children}</div>
       </div>
     </div>
   );
