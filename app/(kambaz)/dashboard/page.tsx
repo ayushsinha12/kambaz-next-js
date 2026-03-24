@@ -35,6 +35,8 @@ export default function Dashboard() {
     description: "New Description",
   };
 
+  const isAdmin = (currentUser as any)?.role === "ADMIN";
+
   const isEnrolled = (courseId: string) => {
     if (!currentUser) return false;
     const user = currentUser as any;
@@ -46,7 +48,7 @@ export default function Dashboard() {
   };
 
   const visibleCourses = currentUser
-    ? showAllCourses
+    ? isAdmin || showAllCourses
       ? courses
       : courses.filter((course: any) => isEnrolled(course._id))
     : [];
@@ -66,13 +68,15 @@ export default function Dashboard() {
           Enrollments
         </button>
 
-        <button
-          className="btn btn-primary float-end"
-          id="wd-add-new-course-click"
-          onClick={() => dispatch(addNewCourse(course))}
-        >
-          Add
-        </button>
+        {isAdmin && (
+          <button
+            className="btn btn-primary float-end"
+            id="wd-add-new-course-click"
+            onClick={() => dispatch(addNewCourse(course))}
+          >
+            Add
+          </button>
+        )}
       </h2>
 
       <hr />
@@ -96,54 +100,60 @@ export default function Dashboard() {
                     width="100%"
                     height={160}
                   />
-                  <CardBody className="card-body">
-                    <CardTitle className="wd-dashboard-course-title text-nowrap overflow-hidden">
-                      {course.name}
-                    </CardTitle>
-
-                    <CardText
-                      className="wd-dashboard-course-description overflow-hidden"
-                      style={{ height: "100px" }}
-                    >
-                      {course.description}
-                    </CardText>
-
-                    <Button variant="primary">Go</Button>
-                  </CardBody>
                 </Link>
 
-                <CardBody>
-                  {isEnrolled(course._id) ? (
-                    <button
-                      className="btn btn-danger float-end"
-                      onClick={() => {
-                        if (!currentUser) return;
-                        dispatch(
-                          unenroll({
-                            user: (currentUser as any)._id,
-                            course: course._id,
-                          })
-                        );
-                      }}
+                <CardBody className="card-body">
+                  <CardTitle className="wd-dashboard-course-title text-nowrap overflow-hidden">
+                    {course.name}
+                  </CardTitle>
+
+                  <CardText
+                    className="wd-dashboard-course-description overflow-hidden"
+                    style={{ height: "100px" }}
+                  >
+                    {course.description}
+                  </CardText>
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <Link
+                      href={`/courses/${course._id}/home`}
+                      className="text-decoration-none"
                     >
-                      Unenroll
-                    </button>
-                  ) : (
-                    <button
-                      className="btn btn-success float-end"
-                      onClick={() => {
-                        if (!currentUser) return;
-                        dispatch(
-                          enroll({
-                            user: (currentUser as any)._id,
-                            course: course._id,
-                          })
-                        );
-                      }}
-                    >
-                      Enroll
-                    </button>
-                  )}
+                      <Button variant="primary">Go</Button>
+                    </Link>
+
+                    {isEnrolled(course._id) ? (
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => {
+                          if (!currentUser) return;
+                          dispatch(
+                            unenroll({
+                              user: (currentUser as any)._id,
+                              course: course._id,
+                            })
+                          );
+                        }}
+                      >
+                        Unenroll
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-success"
+                        onClick={() => {
+                          if (!currentUser) return;
+                          dispatch(
+                            enroll({
+                              user: (currentUser as any)._id,
+                              course: course._id,
+                            })
+                          );
+                        }}
+                      >
+                        Enroll
+                      </button>
+                    )}
+                  </div>
                 </CardBody>
               </Card>
             </Col>
