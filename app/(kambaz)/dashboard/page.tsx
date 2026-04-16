@@ -240,7 +240,8 @@ export default function Dashboard() {
                         className="btn btn-danger"
                         onClick={async () => {
                           if (!currentUser) return;
-                          await enrollmentsClient.unenrollUserFromCourse(
+                          await client.unenrollFromCourse(
+                            "current",
                             courseItem._id
                           );
                           dispatch(
@@ -258,11 +259,17 @@ export default function Dashboard() {
                         className="btn btn-success"
                         onClick={async () => {
                           if (!currentUser) return;
-                          const enrollment =
-                            await enrollmentsClient.enrollUserInCourse(
-                              courseItem._id
-                            );
-                          dispatch(enroll(enrollment));
+                          await client.enrollIntoCourse(
+                            "current",
+                            courseItem._id
+                          );
+                          dispatch(
+                            enroll({
+                              user: (currentUser as any)._id,
+                              course: courseItem._id,
+                              _id: `${(currentUser as any)._id}-${courseItem._id}`,
+                            })
+                          );
                         }}
                       >
                         Enroll
