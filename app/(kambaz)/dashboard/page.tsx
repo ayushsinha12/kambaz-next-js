@@ -13,17 +13,11 @@ import {
 } from "react-bootstrap";
 
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addNewCourse,
-  deleteCourse,
-  updateCourse,
-  setCourses,
-} from "../courses/reducer";
+import { setCourses } from "../courses/reducer";
 import { enroll, unenroll, setEnrollments } from "../enrollments/reducer";
 import { RootState } from "../store";
 import { useState, useEffect } from "react";
 import * as client from "../courses/client";
-import * as enrollmentsClient from "../enrollments/client";
 
 export default function Dashboard() {
   const { courses } = useSelector((state: RootState) => state.coursesReducer);
@@ -52,19 +46,21 @@ export default function Dashboard() {
 
   const fetchCourses = async () => {
     try {
-      const courses = await client.fetchAllCourses();
-      dispatch(setCourses(courses));
-    } catch (error) {
-      console.error(error);
-    }
-  };
+      const fetchedCourses =
+        isFaculty && showAllCourses
+          ? await client.fetchAllCourses()
+          : await client.findMyCourses();
 
-  const fetchEnrollments = async () => {
-    try {
-      if (!currentUser) return;
-      const enrollments =
-        await enrollmentsClient.findEnrollmentsForUser("current");
-      dispatch(setEnrollments(enrollments));
+      dispatch(setCourses(fetchedCourses));
+
+      if (!isFaculty) {
+        const derivedEnrollments = fetchedCourses.map((c: any) => ({
+          user: (currentUser as any)?._id,
+          course: c._id,
+          _id: `${(currentUser as any)?._id}-${c._id}`,
+        }));
+        dispatch(setEnrollments(derivedEnrollments));
+      }
     } catch (error) {
       console.error(error);
     }
@@ -97,8 +93,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!currentUser) return;
     fetchCourses();
-    fetchEnrollments();
-  }, [currentUser]);
+  }, [currentUser, showAllCourses]);
 
   const isEnrolled = (courseId: string) => {
     if (!currentUser) return false;
@@ -110,9 +105,11 @@ export default function Dashboard() {
   };
 
   const visibleCourses = currentUser
-    ? isFaculty || showAllCourses
-      ? courses
-      : courses.filter((c: any) => isEnrolled(c._id))
+    ? isFaculty
+      ? showAllCourses
+        ? courses
+        : courses.filter((c: any) => isEnrolled(c._id))
+      : courses
     : [];
 
   return (
@@ -250,6 +247,11 @@ export default function Dashboard() {
                               course: courseItem._id,
                             })
                           );
+                          dispatch(
+                            setCourses(
+                              courses.filter((c: any) => c._id !== courseItem._id)
+                            )
+                          );
                         }}
                       >
                         Unenroll
@@ -270,6 +272,7 @@ export default function Dashboard() {
                               _id: `${(currentUser as any)._id}-${courseItem._id}`,
                             })
                           );
+                          dispatch(setCourses([...courses, courseItem]));
                         }}
                       >
                         Enroll
