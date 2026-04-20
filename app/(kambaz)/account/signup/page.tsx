@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { setCurrentUser } from "../reducer";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
@@ -9,12 +9,18 @@ import * as client from "../client";
 
 export default function Signup() {
   const [user, setUser] = useState<any>({});
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const signup = async () => {
-    const currentUser = await client.signup(user);
-    dispatch(setCurrentUser(currentUser));
-    redirect("/account/signin");
+    try {
+      const currentUser = await client.signup(user);
+      dispatch(setCurrentUser(currentUser));
+      router.push("/account/signin");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Sign up failed. Is the server running?");
+    }
   };
 
   return (
@@ -47,6 +53,7 @@ export default function Signup() {
       </button>
       <br />
 
+      {error && <div className="alert alert-danger py-2">{error}</div>}
       <Link href="/account/signin" className="wd-signin-link" id="wd-signin-link">
         Sign in
       </Link>

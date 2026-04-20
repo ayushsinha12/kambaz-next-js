@@ -1,21 +1,28 @@
 "use client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { setCurrentUser } from "../reducer";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { FormControl, Button } from "react-bootstrap";
 import * as client from "../client";
 
+
 export default function Signin() {
   const [credentials, setCredentials] = useState<any>({});
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const signin = async () => {
-    const user = await client.signin(credentials);
-    if (!user) return;
-    dispatch(setCurrentUser(user));
-    redirect("/dashboard");
+    try {
+      const user = await client.signin(credentials);
+      if (!user) return;
+      dispatch(setCurrentUser(user));
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Sign in failed. Check your credentials.");
+    }
   };
 
   return (
@@ -46,6 +53,8 @@ export default function Signin() {
       <Button onClick={signin} id="wd-signin-btn" className="w-100 mb-2">
         Sign in
       </Button>
+
+      {error && <div className="alert alert-danger py-2 mb-2">{error}</div>}
 
       <Link id="wd-signup-link" href="/account/signup">
         Sign up

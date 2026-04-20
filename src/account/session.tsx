@@ -13,8 +13,8 @@ export default function Session({ children }: { children: React.ReactNode }) {
     try {
       const currentUser = await client.profile();
       dispatch(setCurrentUser(currentUser));
-    } catch (err) {
-      console.error(err);
+    } catch {
+      // Backend unavailable or user not logged in — proceed as unauthenticated
     }
     setPending(false);
   };

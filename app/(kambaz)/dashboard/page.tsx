@@ -46,20 +46,24 @@ export default function Dashboard() {
 
   const fetchCourses = async () => {
     try {
-      const fetchedCourses =
-        isFaculty && showAllCourses
-          ? await client.fetchAllCourses()
-          : await client.findMyCourses();
-
-      dispatch(setCourses(fetchedCourses));
-
-      if (!isFaculty) {
-        const derivedEnrollments = fetchedCourses.map((c: any) => ({
+      const deriveEnrollments = (courseList: any[]) =>
+        courseList.map((c: any) => ({
           user: (currentUser as any)?._id,
           course: c._id,
           _id: `${(currentUser as any)?._id}-${c._id}`,
         }));
-        dispatch(setEnrollments(derivedEnrollments));
+
+      if (showAllCourses) {
+        const [allCourses, myCourses] = await Promise.all([
+          client.fetchAllCourses(),
+          client.findMyCourses(),
+        ]);
+        dispatch(setCourses(allCourses));
+        dispatch(setEnrollments(deriveEnrollments(myCourses)));
+      } else {
+        const fetchedCourses = await client.findMyCourses();
+        dispatch(setCourses(fetchedCourses));
+        dispatch(setEnrollments(deriveEnrollments(fetchedCourses)));
       }
     } catch (error) {
       console.error(error);
@@ -105,11 +109,9 @@ export default function Dashboard() {
   };
 
   const visibleCourses = currentUser
-    ? isFaculty
-      ? showAllCourses
-        ? courses
-        : courses.filter((c: any) => isEnrolled(c._id))
-      : courses
+    ? showAllCourses
+      ? courses
+      : courses.filter((c: any) => isEnrolled(c._id))
     : [];
 
   return (
@@ -237,21 +239,11 @@ export default function Dashboard() {
                         className="btn btn-danger"
                         onClick={async () => {
                           if (!currentUser) return;
-                          await client.unenrollFromCourse(
-                            "current",
-                            courseItem._id
-                          );
-                          dispatch(
-                            unenroll({
-                              user: (currentUser as any)._id,
-                              course: courseItem._id,
-                            })
-                          );
-                          dispatch(
-                            setCourses(
-                              courses.filter((c: any) => c._id !== courseItem._id)
-                            )
-                          );
+                          await client.unenrollFromCourse("current", courseItem._id);
+                          dispatch(unenroll({ user: (currentUser as any)._id, course: courseItem._id }));
+                          if (!showAllCourses) {
+                            dispatch(setCourses(courses.filter((c: any) => c._id !== courseItem._id)));
+                          }
                         }}
                       >
                         Unenroll
@@ -261,18 +253,15 @@ export default function Dashboard() {
                         className="btn btn-success"
                         onClick={async () => {
                           if (!currentUser) return;
-                          await client.enrollIntoCourse(
-                            "current",
-                            courseItem._id
-                          );
-                          dispatch(
-                            enroll({
-                              user: (currentUser as any)._id,
-                              course: courseItem._id,
-                              _id: `${(currentUser as any)._id}-${courseItem._id}`,
-                            })
-                          );
-                          dispatch(setCourses([...courses, courseItem]));
+                          await client.enrollIntoCourse("current", courseItem._id);
+                          dispatch(enroll({
+                            user: (currentUser as any)._id,
+                            course: courseItem._id,
+                            _id: `${(currentUser as any)._id}-${courseItem._id}`,
+                          }));
+                          if (!showAllCourses) {
+                            dispatch(setCourses([...courses, courseItem]));
+                          }
                         }}
                       >
                         Enroll
